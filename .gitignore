@@ -1,0 +1,27 @@
+node_modules/
+dist/
+coverage/
+*.log
+.env
+.env.*
+# never commit API keys or key files
+api-key.txt
+*.key
+*-key.txt
+*.pem
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+jev-config.json
+jev-usage.jsonl
+jev-decisions.jsonl
+.jev-cache/
+
+# local caches and tool output
+.vitest/
+.eslintcache
+*.tsbuildinfo
+graphify-out/
+.DS_Store
+Thumbs.db

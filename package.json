@@ -1,0 +1,46 @@
+{
+  "name": "jev-mcp",
+  "version": "0.2.0",
+  "description": "MCP server exposing TypeSafe System One (Jev) typed judgments to coding agents",
+  "type": "module",
+  "license": "MIT",
+  "author": "ablau911-ux <233009474+ablau911-ux@users.noreply.github.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ablau911-ux/jev-mcp.git"
+  },
+  "main": "dist/server.js",
+  "bin": {
+    "jev-mcp": "dist/server.js",
+    "jev-mcp-hook": "dist/hook.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "start": "node dist/server.js",
+    "probe": "npm run build && node dist/probe/main.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "@typesafe-ai/sdk": "0.7.0",
+    "yaml": "2.9.1",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.20.5",
+    "ajv": "8.20.0",
+    "eslint": "10.12.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.1"
+  }
+}
