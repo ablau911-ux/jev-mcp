@@ -1,5 +1,7 @@
 # jev-mcp
 
+<p align="center"><img src="docs/hero.png" alt="An AI robot sprinting out of a laptop screen, surrounded by decision cards" width="720"></p>
+
 An MCP server that lets Claude Code use **TypeSafe System One**, model **Jev**: fast typed
 judgments (yes/no probability, a label, a graded level) about state you pass. It never
 generates text. Use it for cheap checks inside coding work: triage failing tests, review diff
