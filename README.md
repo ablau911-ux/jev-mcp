@@ -2,16 +2,33 @@
 
 <p align="center"><img src="docs/hero.png" alt="An AI robot sprinting out of a laptop screen, surrounded by decision cards" width="720"></p>
 
-An MCP server that lets Claude Code use **TypeSafe System One**, model **Jev**: fast typed
-judgments (yes/no probability, a label, a graded level) about state you pass. It never
-generates text. Use it for cheap checks inside coding work: triage failing tests, review diff
-hunks, rerank files, gate an action, check a claim against code.
+A fast, typed-judgment MCP server that lets coding agents (Claude Code first) ask TypeSafe's **Jev**
+yes/no, choice, score and box questions, and act on the answer.
+See `SPEC.md` for the full design and `PROBE-RESULTS.md` for live measurements.
 
-- Stdio MCP server, TypeScript, Node >= 22, ESM, `@typesafe-ai/sdk` **0.7.0** (exact pin).
-- Ground truth for the API: the TypeSafe docs at <https://docs.typesafe.ai> (index:
-  <https://docs.typesafe.ai/llms.txt>) and the schema at <https://api.typesafe.ai/openapi.json>.
-  Where `SPEC.md` disagrees with them, the official docs win. The live probe numbers are in
-  `PROBE-RESULTS.md`.
+> **What Jev is.** Jev is the first **System One** model from [TypeSafe](https://typesafe.ai): a model
+> built to be used by machines, not to chat. *"Send state and typed questions; get structured answers
+> your code can use directly."* It never writes text or code; it returns typed decisions with calibrated
+> probabilities and a separate confidence, so software can act when confidence is high and escalate when
+> it is low. TypeSafe's own comparison on a System One task: **0.114 s vs 8.566 s** and **$0.000081 vs
+> $0.013880** against an LLM. With this server, the ~110-call live probe cost about **$0.002** in total.
+>
+> **What jev-mcp adds.** Three tools for coding agents, input refs instead of pasted state
+> (`$file:`, `$diff`, `$log:`), a secret guard that masks credentials before anything is sent, decision
+> presets (`auto | confirm | review`), caching, rate and cost caps, and calibration from your own feedback.
+> Stdio MCP server, TypeScript, Node >= 22, ESM, `@typesafe-ai/sdk` **0.7.0** (exact pin).
+
+## Question types
+| Type | Jev returns | Typical use in coding work |
+|---|---|---|
+| **Noul** | probability that the answer is *yes* | "Does this diff hunk change behaviour?", gate an action |
+| **Choice** | one option from a set, a probability per option, confidence | triage a failing test: my change / pre-existing / environment / timing / test bug |
+| **Score** | a level on an ordered, described scale, probabilities, confidence | rate the risk of a change, grade a review comment |
+| **Box** | four edges of a region in an image (fractions of width/height) | find a button or field in a screenshot |
+
+Ground truth for the API: the TypeSafe docs at <https://docs.typesafe.ai> (index:
+<https://docs.typesafe.ai/llms.txt>) and the schema at <https://api.typesafe.ai/openapi.json>.
+Where `SPEC.md` disagrees with them, the official docs win.
 
 ## Install
 
