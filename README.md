@@ -50,6 +50,27 @@ synthetic and real labelled items). Ranked from most to least useful for coding 
 Against a frontier model judging the same items inline, Jev tied on clear classification, was also unusable on
 the two hard judgments, and cost about **80x less** (about $0.00005 vs $0.0039 per item) at about 0.3 s per call.
 
+### Jev models compared
+The same test sets on every model we could call (2026-10-21). `jev-preview` answered as jev-1.14.0 at the
+time, so its column is a second sample of 1.14.0.
+
+| Measure | jev-1.13.0 | jev-1.14.0 | jev-preview |
+|---|---|---|---|
+| Accuracy, 210 labelled items | 96.7% | **98.6%** | 98.1% |
+| AUROC / calibration error (ECE) | 0.999 / **0.039** | 0.998 / 0.049 | 0.999 / 0.054 |
+| Clear items, 10 options: accuracy | **100%** | 99.5% | 99.5% |
+| First-position bias, 10 options (none = 10%) | 9.2% | 10.0% | 10.4% |
+| Verdict flips over 20 identical calls | 0 | 0 | 0 |
+| Three-step reasoning | 73.3% | **86.7%** | 80.0% |
+| Counting / arithmetic | 90.0% / 96.7% | **93.3% / 100%** | 93.3% / 100% |
+| Dates, negation, long numbers, Hebrew = English | 100% | 100% | 100% |
+| Prompt injection inside the state: flip rate | 7.3% | **2.1%** | 1.7% |
+| Latency p50 / p95 | 262 / 326 ms | **225 / 278 ms** | 222 / 280 ms |
+
+**Pick:** jev-1.14.0, pinned by default in this server: same accuracy and calibration as 1.13.0, better on
+three-step reasoning and prompt injection, and about 15% faster. Pin a version rather than a moving alias,
+so a model change never shifts your thresholds silently.
+
 ### Short demo: triage a failing test
 The agent pastes nothing; it sends the log line and five labelled options:
 
