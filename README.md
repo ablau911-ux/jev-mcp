@@ -30,6 +30,46 @@ Ground truth for the API: the TypeSafe docs at <https://docs.typesafe.ai> (index
 <https://docs.typesafe.ai/llms.txt>) and the schema at <https://api.typesafe.ai/openapi.json>.
 Where `SPEC.md` disagrees with them, the official docs win.
 
+## Where Jev helps, from our tests
+Measured with this server's stress suite (about 11,000 live calls on jev-1.13.0 / jev-1.14.0, 95% intervals,
+synthetic and real labelled items). Ranked from most to least useful for coding work:
+
+| Rank | Task | Result | Verdict |
+|---|---|---|---|
+| 1 | **Triage of failing tests and logs** (what kind of failure is this?) | 100% accuracy, AUROC 1.000 on labelled test logs | Use it |
+| 2 | **Clear, one-step classification** (language, intent, sentiment, category) | 96.7 to 100% accuracy, AUROC 0.999; paraphrases agree 99.3% | Use it |
+| 3 | **Many questions about one state** (batch up to 30 per call) | same verdict as separate calls in 99.2% of pairs, **12.4x cheaper, 29.9x faster** | Use it |
+| 4 | **Finding a fact in a long file or log** | 100% needle accuracy from 1 KB to 256 KB (long-context header above ~48 KB of logs) | Use it |
+| 5 | **Gating on confidence** (act when sure, ask when not) | at confidence >= 0.9: 100% accuracy on 85% of items | Use it |
+| 6 | **Scoring on a scale; locating a region in a screenshot** | score: 97.5 to 100% exact level; box: mean IoU 0.73, 87% hits | Use it, compare levels, not exact p |
+| 7 | **Screening diff hunks for relevance** | 94% on security-diff decoys; mismatched bug/hunk pairs rejected 100% | Use it as a filter |
+| 8 | **Subjective engineering choices** ("A or B?") | winner changed with wording in 19.6% of framed calls, with option order in 17 to 33% of subjective items | Only with an order check and a human |
+| 9 | **Three-step reasoning chains** | 73 to 87% (two steps: 100%) | Split into single steps |
+| 10 | **"Is this bug report real?" / "Does this patch fix the bug?"** | AUROC 0.64 and 0.57: near chance; accuracy equals the always-yes base rate | Do not use; run the tests, ask a reviewer |
+
+Against a frontier model judging the same items inline, Jev tied on clear classification, was also unusable on
+the two hard judgments, and cost about **80x less** (about $0.00005 vs $0.0039 per item) at about 0.3 s per call.
+
+### Short demo: triage a failing test
+The agent pastes nothing; it sends the log line and five labelled options:
+
+```json
+jev_ask {"recipe": "classify", "args": {
+  "state": "FAIL test/unit/day-usage-lock.test.ts > reclaims a stale lock: expected 5, received undefined. The test passed before the last commit that changed DayUsageStore.add.",
+  "options": {"my_change": "Caused by the current diff", "preexisting": "Failed before this change",
+              "env_infra": "Environment or infrastructure", "timing": "Timing or ordering", "test_bug": "The test itself is wrong"},
+  "none_option": "noul"}}
+```
+
+Live answer (jev-1.14.0):
+
+```json
+{"choice": "my_change", "confidence": 1, "probabilities": {"my_change": 1, "preexisting": 0, "env_infra": 0, "timing": 0, "test_bug": 0},
+ "usage": {"requests": 1, "input_tokens": 423, "est_cost_usd": 0.000018}}
+```
+
+The agent now knows to look at its own last change first, for less than two thousandths of a cent.
+
 ## Install
 
 1. **Requirements:** Node.js >= 22, git, and a TypeSafe API key (create one at
